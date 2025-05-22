@@ -1,19 +1,48 @@
+/*jshint esversion: 8 */
+require('dotenv').config();
 const express = require('express');
-const app = express();
+const cors = require('cors');
+const pinoLogger = require('./logger');
 
-// Middleware to parse JSON bodies
+const connectToDatabase = require('./models/db');
+const {loadData} = require("./util/import-mongo/index");
+
+
+const app = express();
+app.use("*",cors());
+const port = 3060;
+
+// Connect to MongoDB; we just do this one time
+connectToDatabase().then(() => {
+    pinoLogger.info('Connected to DB');
+})
+    .catch((e) => console.error('Failed to connect to DB', e));
+
+
 app.use(express.json());
 
-// Task 1: Import the giftRoutes and store in a constant called giftRoutes
+// Route files
 const giftRoutes = require('./routes/giftRoutes');
+const searchRoutes = require('./routes/searchRoutes');
+const pinoHttp = require('pino-http');
+const logger = require('./logger');
 
-// Task 2: Add the giftRoutes to the server
+app.use(pinoHttp({ logger }));
+
+// Use Routes
 app.use('/api/gifts', giftRoutes);
+app.use('/api/search', searchRoutes);
 
-// Optional: Test route
-app.get('/', (req, res) => {
-    res.send('GiftLink API is running!');
+// Global Error Handler
+app.use((err, req, res, next) => {
+    console.error(err);
+    res.status(500).send('Internal Server Error');
 });
 
-// Export the app for use in server.js
-module.exports = app;
+app.get("/",(req,res)=>{
+    res.send("Inside the server")
+})
+
+app.listen(port, () => {
+    console.log(`Server running on port ${port}`);
+});
