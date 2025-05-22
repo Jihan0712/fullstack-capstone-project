@@ -16,13 +16,11 @@ const logger = pino();
 // Load JWT secret from .env
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-key-for-dev';
 
-// Register Route
-router.post('/register', [
-    // Input validation
-    body('firstName').notEmpty().withMessage('First name is required'),
-    body('lastName').notEmpty().withMessage('Last name is required'),
+// Login Endpoint
+router.post('/login', [
+    // Validate input fields
     body('email').isEmail().withMessage('Please enter a valid email'),
-    body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters')
+    body('password').notEmpty().withMessage('Password is required')
 ], async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -31,48 +29,53 @@ router.post('/register', [
 
     try {
         // Task 1: Connect to `giftsdb` in MongoDB through `connectToDatabase` in `db.js`
-        const db = await connectToDatabase(); // ✅ Connected to DB
+        const db = await connectToDatabase();
 
-        // Task 2: Access MongoDB collection
-        const collection = db.collection("users"); // ✅ Using "users" collection
+        // Task 2: Access MongoDB users collection
+        const collection = db.collection("users");
 
-        // Task 3: Check for existing email ID
-        const existingUser = await collection.findOne({ email: req.body.email });
-        if (existingUser) {
-            return res.status(400).json({ error: "Email already exists" });
+        // Task 3: Check for user credentials in database
+        const { email, password } = req.body;
+        const theUser = await collection.findOne({ email });
+
+        // Task 7: Send appropriate message if user not found
+        if (!theUser) {
+            logger.error('User not found');
+            return res.status(404).json({ error: 'User not found' });
         }
 
-        // Generate salt and hash password
-        const salt = await bcryptjs.genSalt(10); // ✅ Salt generated
-        const hash = await bcryptjs.hash(req.body.password, salt); // ✅ Password hashed
+        // Task 4: Check if the password matches the encrypted password
+        const isMatch = await bcryptjs.compare(password, theUser.password);
+        if (!isMatch) {
+            logger.error('Passwords do not match');
+            return res.status(400).json({ error: 'Wrong password' });
+        }
 
-        // Task 4: Save user details in database
-        const newUser = await collection.insertOne({
-            email: req.body.email,
-            firstName: req.body.firstName,
-            lastName: req.body.lastName,
-            password: hash,
-            createdAt: new Date(),
-        });
-
-        // Task 5: Create JWT authentication with user._id as payload
+        // Task 6: Create JWT authentication with user._id as payload
         const payload = {
             user: {
-                id: newUser.insertedId,
-            },
+                id: theUser._id.toString()
+            }
         };
 
-        const authtoken = jwt.sign(payload, JWT_SECRET, { expiresIn: '1h' }); // ✅ Token created
-        const email = req.body.email;
+        const authtoken = jwt.sign(payload, JWT_SECRET, { expiresIn: '1h' });
 
-        logger.info('User registered successfully');
+        // Task 5: Extract user details to send back
+        const userName = `${theUser.firstName} ${theUser.lastName}`;
+        const userEmail = theUser.email;
 
-        // Send response
-        res.json({ authtoken, email });
+        logger.info(`User logged in successfully: ${userEmail}`);
+
+        // Return auth token and user info
+        res.json({
+            authtoken,
+            userName,
+            userEmail
+        });
 
     } catch (e) {
-        logger.error(`Registration failed: ${e.message}`);
-        return res.status(500).send('Internal server error');
+        logger.error(`Login failed: ${e.message}`);
+        res.status(500).send('Internal server error');
     }
 });
 
