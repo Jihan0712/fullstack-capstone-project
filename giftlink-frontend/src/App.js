@@ -1,6 +1,5 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext'; 
 import MainPage from './components/MainPage/MainPage';
 import LoginPage from './components/LoginPage/LoginPage';
 import RegisterPage from './components/RegisterPage/RegisterPage';
@@ -13,22 +12,20 @@ import './App.css';
 function App() {
   return (
     <Router>
-      <AuthProvider> 
-        <>
-          <Navbar />
-          <div className="container mt-4">
-            <Routes>
-              <Route path="/" element={<MainPage />} />
-              <Route path="/app" element={<MainPage />} />
-              <Route path="/app/login" element={<LoginPage />} />
-              <Route path="/app/register" element={<RegisterPage />} />
-              <Route path="/app/product/:productId" element={<DetailsPage />} />
-              <Route path="/app/details" element={<DetailsPage />} />
-              <Route path="/app/search" element={<SearchPage />} />
-            </Routes>
-          </div>
-        </>
-      </AuthProvider>
+      <>
+        <Navbar />
+        <div className="container mt-4">
+          <Routes>
+            <Route path="/" element={<MainPage />} />
+            <Route path="/app" element={<MainPage />} />
+            <Route path="/app/login" element={<LoginPage />} />
+            <Route path="/app/register" element={<RegisterPage />} />
+            <Route path="/app/product/:productId" element={<DetailsPage />} />
+            <Route path="/app/details" element={<DetailsPage />} />
+            <Route path="/app/search" element={<SearchPage />} />
+          </Routes>
+        </div>
+      </>
     </Router>
   );
 }

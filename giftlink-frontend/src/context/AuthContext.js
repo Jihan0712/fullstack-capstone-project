@@ -6,9 +6,10 @@ const AuthContext = createContext();
 // Step 2: Create the AuthProvider component
 export const AuthProvider = ({ children }) => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [userName, setUserName] = useState(null);
 
     return (
-        <AuthContext.Provider value={{ isLoggedIn, setIsLoggedIn }}>
+        <AuthContext.Provider value={{ isLoggedIn, setIsLoggedIn, userName, setUserName }}>
             {children}
         </AuthContext.Provider>
     );

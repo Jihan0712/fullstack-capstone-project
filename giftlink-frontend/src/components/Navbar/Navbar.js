@@ -7,6 +7,15 @@ export default function Navbar() {
     const { isLoggedIn, setIsLoggedIn, userName, setUserName } = useAppContext();
     const navigate = useNavigate();
 
+    console.log('isLoggedIn:', isLoggedIn);
+    console.log('setIsLoggedIn:', setIsLoggedIn);
+    console.log('userName:', userName);
+    console.log('setUserName:', setUserName);
+
+    if (typeof setUserName !== 'function') {
+        console.error('setUserName is not a function');
+    }
+
     // Load session storage data on component mount
     useEffect(() => {
         const authTokenFromSession = sessionStorage.getItem('auth-token');
