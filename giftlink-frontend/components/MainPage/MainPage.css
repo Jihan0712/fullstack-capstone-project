@@ -1,0 +1,33 @@
+.product-card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.image-placeholder {
+    height: 200px;
+    overflow: hidden;
+    background-color: #f8f8f8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 1px solid #ddd;
+}
+
+.image-placeholder img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.no-image-available {
+    font-size: 0.9rem;
+    color: #777;
+    text-align: center;
+    padding: 10px;
+}
+
+.date-added {
+    font-size: 0.85rem;
+    color: #555;
+}
