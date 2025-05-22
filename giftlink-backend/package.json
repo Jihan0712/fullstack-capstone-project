@@ -8,8 +8,15 @@
         "import-gifts": "node util/import-mongo/index.js"
     },
     "dependencies": {
-        "dotenv": "^16.0.3",
+        "bcryptjs": "^3.0.2",
+        "cors": "^2.8.5",
+        "dotenv": "^16.5.0",
         "express": "^4.21.2",
-        "mongodb": "^5.2.0"
+        "express-validator": "^7.2.1",
+        "jsonwebtoken": "^9.0.2",
+        "mongodb": "^5.9.2",
+        "pino": "^9.7.0",
+        "pino-http": "^10.4.0",
+        "pino-pretty": "^13.0.0"
     }
 }
