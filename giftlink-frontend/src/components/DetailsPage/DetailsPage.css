@@ -1,0 +1,21 @@
+.product-image-large {
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;
+}
+
+.no-image-available {
+    font-style: italic;
+    color: #666;
+}
+
+.card-title {
+    font-size: 1.75rem;
+    margin-bottom: 1rem;
+}
+
+.list-group-item {
+    background-color: #f8f9fa;
+    border: none;
+    border-bottom: 1px solid #ddd;
+}

@@ -1,0 +1,18 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f5f5f5;
+    padding-top: 20px;
+}
+
+.container.mt-5 {
+    margin-bottom: 60px;
+}
+
+.btn-link {
+    color: #007bff;
+    text-decoration: underline;
+}
+
+.btn-link:hover {
+    color: #0056b3;
+}
