@@ -1,0 +1,15 @@
+{
+    "name": "giftlink-backend",
+    "version": "1.0.0",
+    "description": "Backend service for the GiftLink Capstone Project",
+    "main": "server.js",
+    "scripts": {
+        "start": "node server.js",
+        "import-gifts": "node util/import-mongo/index.js"
+    },
+    "dependencies": {
+        "dotenv": "^16.0.3",
+        "express": "^4.21.2",
+        "mongodb": "^5.2.0"
+    }
+}
