@@ -1,10 +1,10 @@
-require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const pino = require('pino');
 const pinoHttp = require('pino-http');
 const connectToDatabase = require('./models/db');
 const authRoutes = require('./routes/authRoutes');
+const giftRoutes = require('./routes/giftRoutes'); // Import gift routes
 
 // Create logger instance
 const logger = pino();
@@ -25,11 +25,12 @@ app.get('/', (req, res) => {
 
 // Use Routes
 app.use('/api/auth', authRoutes); // Mount authentication routes
+app.use('/api/gifts', giftRoutes); // Mount gift routes
 
 // Global Error Handler
 app.use((err, req, res, next) => {
     logger.error(err, 'Unhandled error in server.js');
-    res.status(500).json({ error: 'Internal Server Error' });
+    res.status(500).json({ error: 'Internal server error' });
 });
 
 // Connect to MongoDB

@@ -27,7 +27,7 @@ function MainPage() {
 
     // Navigate to product details page
     const goToDetailsPage = (productId) => {
-        navigate(`/app/product/${productId}`);
+        navigate(`/app/product/${productId}`); // Ensure productId is the _id field
     };
 
     // Format timestamp to readable date
@@ -50,7 +50,7 @@ function MainPage() {
             <h2 className="mb-4">Available Gifts</h2>
             <div className="row">
                 {gifts.map((gift) => (
-                    <div key={gift.id} className="col-md-4 mb-4">
+                    <div key={gift._id} className="col-md-4 mb-4">
                         <div className="card product-card shadow-sm">
                             <div className="image-placeholder">
                                 {gift.image ? (
@@ -72,7 +72,7 @@ function MainPage() {
                             </div>
                             <div className="card-footer">
                                 <button
-                                    onClick={() => goToDetailsPage(gift.id)}
+                                    onClick={() => goToDetailsPage(gift._id)} // Use _id instead of id
                                     className="btn btn-primary w-100"
                                 >
                                     View Details

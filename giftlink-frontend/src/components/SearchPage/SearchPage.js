@@ -1,31 +1,40 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import { urlConfig } from '../../config';
-import './SearchPage.css';
 
 function SearchPage() {
     const [searchQuery, setSearchQuery] = useState('');
-    const [ageRange, setAgeRange] = useState(6);
+    const [ageRange, setAgeRange] = useState(6); // Initialize with minimum value
     const [searchResults, setSearchResults] = useState([]);
-    const navigate = useNavigate();
+    const categories = ['Living', 'Bedroom', 'Bathroom', 'Kitchen', 'Office'];
+    const conditions = ['New', 'Like New', 'Older'];
 
-    // Define categories and conditions for dropdowns
-    const categories = ['Toys', 'Books', 'Electronics', 'Clothing', 'Games'];
-    const conditions = ['New', 'Like New', 'Used', 'Poor'];
+    useEffect(() => {
+        // Fetch all products when the component mounts
+        const fetchProducts = async () => {
+            try {
+                const response = await fetch(`${urlConfig.backendUrl}/api/gifts`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error; ${response.status}`);
+                }
+                const data = await response.json();
+                setSearchResults(data);
+            } catch (error) {
+                console.log('Fetch error: ' + error.message);
+            }
+        };
+        fetchProducts();
+    }, []);
 
-    // Navigate to Details Page
-    const goToDetailsPage = (productId) => {
-        navigate(`/app/product/${productId}`);
-    };
-
-    // Fetch search results
     const handleSearch = async () => {
+        // Construct the search URL based on user input
         const baseUrl = `${urlConfig.backendUrl}/api/search?`;
         const queryParams = new URLSearchParams({
             name: searchQuery,
             age_years: ageRange,
-            category: document.getElementById('categorySelect')?.value || '',
-            condition: document.getElementById('conditionSelect')?.value || ''
+            category: document.getElementById('categorySelect').value,
+            condition: document.getElementById('conditionSelect').value,
         }).toString();
 
         try {
@@ -40,116 +49,95 @@ function SearchPage() {
         }
     };
 
+    const navigate = useNavigate();
+    const goToDetailsPage = (productId) => {
+        navigate(`/app/product/${productId}`);
+    };
+
     return (
         <div className="container mt-5">
-            <h2 className="mb-4 text-center">Gift Search</h2>
-
-            {/* Search Input Fields */}
-            <div className="row mb-4">
+            <div className="row justify-content-center">
                 <div className="col-md-6">
+                    {/* Filters Section */}
+                    <div className="filter-section mb-3 p-3 border rounded">
+                        <h5>Filters</h5>
+                        <div className="d-flex flex-column">
+                            {/* Category Dropdown */}
+                            <label htmlFor="categorySelect">Category</label>
+                            <select id="categorySelect" className="form-control my-1">
+                                <option value="">All</option>
+                                {categories.map(category => (
+                                    <option key={category} value={category}>{category}</option>
+                                ))}
+                            </select>
+
+                            {/* Condition Dropdown */}
+                            <label htmlFor="conditionSelect">Condition</label>
+                            <select id="conditionSelect" className="form-control my-1">
+                                <option value="">All</option>
+                                {conditions.map(condition => (
+                                    <option key={condition} value={condition}>{condition}</option>
+                                ))}
+                            </select>
+
+                            {/* Age Range Slider */}
+                            <label htmlFor="ageRange">Less than {ageRange} years</label>
+                            <input
+                                type="range"
+                                className="form-control-range"
+                                id="ageRange"
+                                min="1"
+                                max="10"
+                                value={ageRange}
+                                onChange={e => setAgeRange(e.target.value)}
+                            />
+                        </div>
+                    </div>
+
+                    {/* Search Input and Button */}
                     <input
                         type="text"
-                        className="form-control"
-                        placeholder="Search by gift name..."
+                        className="form-control mb-2"
+                        placeholder="Search for items..."
                         value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
+                        onChange={e => setSearchQuery(e.target.value)}
                     />
-                </div>
-                <div className="col-md-3">
-                    <select id="categorySelect" className="form-control">
-                        <option value="">All Categories</option>
-                        {categories.map((category) => (
-                            <option key={category} value={category}>
-                                {category}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-                <div className="col-md-3">
-                    <select id="conditionSelect" className="form-control">
-                        <option value="">All Conditions</option>
-                        {conditions.map((condition) => (
-                            <option key={condition} value={condition}>
-                                {condition}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-            </div>
+                    <button className="btn btn-primary w-100" onClick={handleSearch}>Search</button>
 
-            {/* Age Range Slider */}
-            <div className="row mb-4 align-items-center">
-                <div className="col-md-3">
-                    <label htmlFor="ageRange">Max Age:</label>
-                </div>
-                <div className="col-md-6">
-                    <input
-                        type="range"
-                        className="form-range"
-                        id="ageRange"
-                        min="1"
-                        max="10"
-                        value={ageRange}
-                        onChange={(e) => setAgeRange(parseInt(e.target.value))}
-                    />
-                </div>
-                <div className="col-md-3 text-center">
-                    <strong>{ageRange} years</strong>
-                </div>
-            </div>
-
-            {/* Search Button */}
-            <div className="row mb-4">
-                <div className="col-md-12 text-center">
-                    <button className="btn btn-primary" onClick={handleSearch}>
-                        Search Gifts
-                    </button>
-                </div>
-            </div>
-
-            {/* Search Results */}
-            <div className="search-results mt-4">
-                {searchResults.length > 0 ? (
-                    searchResults.map((product) => (
-                        <div key={product.id} className="card mb-4 shadow-sm">
-                            <div className="row g-0">
-                                <div className="col-md-4">
+                    {/* Search Results */}
+                    <div className="search-results mt-4">
+                        {searchResults.length > 0 ? (
+                            searchResults.map(product => (
+                                <div key={product.id} className="card mb-3">
+                                    {/* Product Image */}
                                     {product.image ? (
-                                        <img
-                                            src={product.image}
-                                            alt={product.name}
-                                            className="img-fluid rounded-start card-img-top"
-                                        />
+                                        <img src={product.image} alt={product.name} className="card-img-top" />
                                     ) : (
-                                        <div className="no-image-available p-4 bg-light border-end">
+                                        <div className="card-img-top no-image-available text-center py-4 bg-light">
                                             No Image Available
                                         </div>
                                     )}
-                                </div>
-                                <div className="col-md-8">
                                     <div className="card-body">
                                         <h5 className="card-title">{product.name}</h5>
-                                        <p className="card-text">
-                                            {product.description.slice(0, 100)}...
-                                        </p>
-                                        <div className="card-footer bg-white border-0">
-                                            <button
-                                                onClick={() => goToDetailsPage(product.id)}
-                                                className="btn btn-primary"
-                                            >
-                                                View More
-                                            </button>
-                                        </div>
+                                        <p className="card-text">{product.description.slice(0, 100)}...</p>
+                                    </div>
+                                    <div className="card-footer">
+                                        <button
+                                            onClick={() => goToDetailsPage(product.id)}
+                                            className="btn btn-primary w-100"
+                                        >
+                                            View More
+                                        </button>
                                     </div>
                                 </div>
+                            ))
+                        ) : (
+                            <div className="alert alert-info" role="alert">
+                                No products found. Please revise your filters.
                             </div>
-                        </div>
-                    ))
-                ) : (
-                    <div className="alert alert-info text-center" role="alert">
-                        No gifts found. Please adjust your filters.
+                        )}
                     </div>
-                )}
+                </div>
             </div>
         </div>
     );
